@@ -1,0 +1,60 @@
+
+  const renderCheckbox = (author) => {
+    const { users } = modifiedData;
+    const isChecked = users.includes(author.id);
+    const handleCheckboxChange = () => {
+      if (!users.includes(author.id)) {
+        handleChange({
+          target: { name: "users", value: users.concat(author.id) },
+        });
+      } else {
+        handleChange({
+          target: {
+            name: "users",
+            value: users.filter((v) => v !== author.id),
+          },
+        });
+      }
+    };
+    return (
+      <div key={author.id}>
+        <label htmlFor={author.id}>{author.name}</label>
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={handleCheckboxChange}
+          name="users"
+          id={author.id}
+        />
+      </div>
+    );
+  };
+  if (error) {
+    return <div>An error occured (users): {error.message}</div>;
+  }
+  if (errorComments) {
+    return <div>An error occured (comments): {errorComments.message}</div>;
+  }
+
+
+
+
+
+  ---------------
+  <div>
+          <br />
+          <b>Select users</b>
+          <br />
+          {comments.map(renderCheckbox)}
+        </div>
+
+        ----------------------------------
+        const submitBook = async () => {
+          const response = await fetch("/api/books", {
+            method: "POST",
+            body: JSON.stringify({ data.id:  }),
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await response.json();
+          console.log(data);
+        };
