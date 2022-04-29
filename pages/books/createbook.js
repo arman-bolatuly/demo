@@ -1,56 +1,43 @@
 import { useState } from "react";
+import useSwr from "swr";
 import axios from "axios";
 
 const Createbooks = () => {
   const url = "http://localhost:3000/api/books";
+  const fetcher = (url) => axios(url).then((res) => res.data);
   const [book, setBook] = useState({
     id: "",
     title: "",
     year: "",
   });
+  const { data, mutate } = useSwr(url, fetcher);
 
-  function submitBook(e) {
-    axios
-      .post(url, {
-        id: parseInt(book.id),
+  const handlerSubmit = async (e) => {
+    e.preventDefault();
+    setBook("");
+    const newBook = {
         title: book.title,
-        year: parseInt(book.year),
-      })
-      .then((res) => {
-        console.log(res.book);
-      });
-  }
-
-  function handle(e) {
-    const newBook = { ...book };
-    newBook[e.target.id] = e.target.value;
-    setBook(newBook);
+        year: parseInt(book.year)
+    };
+    mutate([...data, newBook], false);
+    await axios.post(url, newBook);
+    mutate();
   }
 
   return (
     <>
-      <h1>Createbooks</h1>
-
-      <input
-        type="number"
-        id="id"
-        value={book.id}
-        onChange={(e) => setBook(e.target.value)}
-      />
-      <input
+    <h1>Createbooks</h1>
+    <form onSubmit={handlerSubmit}>
+      <input onChange={(e) => setBook(e.target.value)}
         type="text"
-        id="title"
-        value={book.title}
-        onChange={(e) => setBook(e.target.value)}
-      />
-      <input
+        id="name"
+        value={book.name}></input>
+        <input onChange={(e) => setBook(e.target.value)}
         type="number"
         id="year"
-        value={book.year}
-        onChange={(e) => setBook(e.target.value)}
-      />
-
-      <button onClick={submitBook}>Submit book</button>
+        value={book.year}></input>
+      <button type="submit">Send</button>
+      </form>
     </>
   );
 };

@@ -1,27 +1,39 @@
-import { useState } from "react";
+import useSWR from "swr";
+import axios from "axios";
 
-const Books = () => {
-  const [books, setBooks] = useState([]);
 
-  const fetchBooks = async () => {
-    const response = await fetch("/api/books");
-    const data = await response.json();
-    setBooks(data);
-  };
+const Books = ({books}) => {
+  const fetcher = (url) => axios.get("http://localhost:3001/api/books").then((res) => res.data);
+  const { data, error, mutate } = useSWR("/api/books", fetcher);
+  if (error) return <div>ошибка загрузки</div>;
+  if (!data) return <div>загрузка...</div>;
+
+  const deleteBook = async(id) => {
+    await axios
+    .delete(`http://localhost:3001/api/books/${id}`)
+    await mutate()
+  }
 
   return (
-    <>
-      <h1>Books</h1>
-      <button onClick={fetchBooks}>Load books</button>
-      {books.map((book) => {
-        return (
-          <div key={book.id}>
-            {book.id} {book.title} {book.year}
-          </div>
-        );
-      })}
-    </>
-  );
+  <>
+    Books:
+  <ul>
+    {books.map((book) => (
+      <li key={book.id}>Название книги: {book.name}, Автор книги: {book.author.name}<button onClick={() => deleteBook(book.id)}>Удалить</button></li>
+    ))
+    }
+    </ul>
+  </>
+  )
 };
 
+export async function getStaticProps() {
+  const books = await axios.get('http://localhost:3001/api/books').then((res) => res.data);
+  
+  return {
+    props: {
+      books,
+    },
+  }
+}
 export default Books;
